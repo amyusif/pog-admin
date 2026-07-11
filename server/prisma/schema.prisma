@@ -1,0 +1,86 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(STAFF)
+  profile   Profile?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName String
+  lastName  String
+  phone     String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  STAFF
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  client    String
+  event     String
+  date      DateTime
+  location  String
+  budget    String
+  status    BookingStatus @default(PENDING)
+  assignedTo String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  title     String
+  date      DateTime
+  time      String
+  venue     String
+  type      String
+  staff     Int
+  color     String   @default("#d97706")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Employee {
+  id         String   @id @default(uuid())
+  name       String
+  role       String
+  department String
+  phone      String?
+  email      String   @unique
+  available  Boolean  @default(true)
+  events     Int      @default(0)
+  rating     Float    @default(0.0)
+  avatar     String?
+  joinDate   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
