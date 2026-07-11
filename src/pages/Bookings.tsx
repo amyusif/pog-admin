@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Eye, Check, X, Calendar as CalIcon, MapPin, DollarSign, User, FileText, MoreVertical, Trash2, Phone, Mail } from 'lucide-react';
+import { Search, Plus, X, Trash2, Phone, Mail, Check } from 'lucide-react';
 import api from '../services/api';
 
 const statusConfig: Record<string, { bg: string; color: string }> = {
@@ -32,7 +32,7 @@ export default function Bookings() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
+
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
@@ -176,7 +176,7 @@ export default function Bookings() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e293b' }}>
-                {['Client', 'Event', 'Date', 'Location', 'Package / Services', 'Status', 'Actions'].map(h => (
+                {['Client', 'Event', 'Date', 'Location', 'Package / Services', 'Status'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '14px 16px', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', background: '#0a0f1a' }}>{h}</th>
                 ))}
               </tr>
@@ -185,7 +185,13 @@ export default function Bookings() {
               {paginatedBookings.map((b, i) => {
                 const sc = statusConfig[b.status] || { bg: '#1e293b', color: '#94a3b8' };
                 return (
-                  <tr key={b.id} style={{ borderBottom: i < paginatedBookings.length - 1 ? '1px solid #1e293b' : 'none', transition: 'background 0.1s' }}
+                  <tr key={b.id}
+                    onClick={() => setSelectedBooking(b)}
+                    style={{
+                      borderBottom: i < paginatedBookings.length - 1 ? '1px solid #1e293b' : 'none',
+                      transition: 'background 0.1s',
+                      cursor: 'pointer',
+                    }}
                     onMouseEnter={e => (e.currentTarget.style.background = '#1e293b')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                   >
@@ -205,39 +211,12 @@ export default function Bookings() {
                     <td style={{ padding: '14px 16px' }}>
                       <span style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600, background: sc.bg, color: sc.color }}>{b.status}</span>
                     </td>
-                    <td style={{ padding: '14px 16px', position: 'relative' }}>
-                      <button onClick={() => setOpenActionMenu(openActionMenu === b.id ? null : b.id)}
-                        style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '6px' }}>
-                        <MoreVertical size={16} />
-                      </button>
-                      
-                      {openActionMenu === b.id && (
-                        <>
-                          <div style={{ position: 'fixed', inset: 0, zIndex: 9 }} onClick={() => setOpenActionMenu(null)} />
-                          <div style={{ position: 'absolute', right: '30px', top: '40px', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '4px', zIndex: 10, width: '140px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}>
-                            <button onClick={() => { setSelectedBooking(b); setOpenActionMenu(null); }}
-                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#f8fafc', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
-                              <Eye size={14} /> View Details
-                            </button>
-                            <button onClick={() => { handleUpdateStatus(b.id, b.status === 'CONFIRMED' ? 'PENDING' : 'CONFIRMED'); setOpenActionMenu(null); }}
-                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#f8fafc', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
-                              <Check size={14} /> Toggle Status
-                            </button>
-                            <div style={{ height: '1px', background: '#334155', margin: '4px 0' }} />
-                            <button onClick={() => { handleDelete(b.id); setOpenActionMenu(null); }}
-                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#ef4444', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
-                              <Trash2 size={14} /> Delete
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </td>
                   </tr>
                 );
               })}
               {paginatedBookings.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ padding: '48px', textAlign: 'center', color: '#475569' }}>No bookings found.</td>
+                  <td colSpan={6} style={{ padding: '48px', textAlign: 'center', color: '#475569' }}>No bookings found.</td>
                 </tr>
               )}
             </tbody>
@@ -353,49 +332,84 @@ export default function Bookings() {
         </div>
       )}
 
-      {/* ── View / Approve Booking Modal ── */}
+      {/* ── Booking Detail Mini Modal ── */}
       {selectedBooking && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}
-          onClick={() => setSelectedBooking(null)}>
-          <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '20px', padding: '32px', width: '500px', maxWidth: '90vw' }}
-            onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <div>
-                <h2 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#f8fafc' }}>Booking Details</h2>
-                <span style={{ fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px', background: statusConfig[selectedBooking.status]?.bg, color: statusConfig[selectedBooking.status]?.color }}>{selectedBooking.status}</span>
+        <div
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)' }}
+          onClick={() => setSelectedBooking(null)}
+        >
+          <div
+            style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '20px', width: '480px', maxWidth: '92vw', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Modal header */}
+            <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0a0f1a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#f8fafc' }}>Booking Details</h2>
+                <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: statusConfig[selectedBooking.status]?.bg, color: statusConfig[selectedBooking.status]?.color }}>
+                  {selectedBooking.status}
+                </span>
               </div>
-              <button onClick={() => setSelectedBooking(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={20} /></button>
+              <button onClick={() => setSelectedBooking(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', lineHeight: 1 }}>
+                <X size={18} />
+              </button>
             </div>
 
-            {[
-              ['Client', selectedBooking.client],
-              ['Event Type', selectedBooking.event],
-              ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
-              ['Location', selectedBooking.location],
-              ['Package / Services', selectedBooking.budget],
-              ['Phone Number', selectedBooking.phone || 'Not provided'],
-              ['Email Address', selectedBooking.email || 'Not provided'],
-              ['Status', selectedBooking.status],
-              ['Assigned To', selectedBooking.assignedTo || 'Unassigned'],
-            ].map(([label, value]) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0', borderBottom: '1px solid #1e293b' }}>
-                <span style={{ fontSize: '13px', color: '#64748b', flexShrink: 0, marginRight: '16px' }}>{label}</span>
-                <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500, textAlign: 'right' }}>{value}</span>
-              </div>
-            ))}
+            {/* Details grid */}
+            <div style={{ padding: '16px 24px' }}>
+              {[
+                ['Client', selectedBooking.client],
+                ['Event Type', selectedBooking.event],
+                ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })],
+                ['Location', selectedBooking.location],
+                ['Package / Services', selectedBooking.budget],
+                ['Phone', selectedBooking.phone || '—'],
+                ['Email', selectedBooking.email || '—'],
+                ['Assigned To', selectedBooking.assignedTo || 'Unassigned'],
+              ].map(([label, value]) => (
+                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0, marginRight: '12px' }}>{label}</span>
+                  <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500, textAlign: 'right', wordBreak: 'break-all' }}>{value}</span>
+                </div>
+              ))}
+            </div>
 
-            {selectedBooking.status === 'PENDING' && (
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px', justifyContent: 'flex-end' }}>
-                <button onClick={() => { handleUpdateStatus(selectedBooking.id, 'CANCELLED'); setSelectedBooking(null); }}
-                  style={{ background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '10px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
+            {/* Action buttons — always visible */}
+            <div style={{ padding: '16px 24px 20px', display: 'flex', gap: '10px', justifyContent: 'flex-end', background: '#0a0f1a', borderTop: '1px solid #1e293b' }}>
+              <button
+                onClick={() => { if (confirm('Delete this booking?')) { handleDelete(selectedBooking.id); setSelectedBooking(null); } }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '9px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+              >
+                <Trash2 size={14} /> Delete
+              </button>
+
+              {selectedBooking.status !== 'CANCELLED' && selectedBooking.status !== 'COMPLETED' && (
+                <button
+                  onClick={() => { handleUpdateStatus(selectedBooking.id, 'CANCELLED'); setSelectedBooking(null); }}
+                  style={{ background: 'transparent', border: '1px solid #334155', color: '#94a3b8', padding: '9px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                >
                   Reject
                 </button>
-                <button onClick={() => { handleUpdateStatus(selectedBooking.id, 'CONFIRMED'); setSelectedBooking(null); }}
-                  style={{ background: '#10b981', border: 'none', color: '#fff', padding: '10px 20px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
-                  Approve Booking
+              )}
+
+              {(selectedBooking.status === 'PENDING' || selectedBooking.status === 'CANCELLED') && (
+                <button
+                  onClick={() => { handleUpdateStatus(selectedBooking.id, 'CONFIRMED'); setSelectedBooking(null); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none', color: '#fff', padding: '9px 18px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                >
+                  <Check size={14} /> Approve
                 </button>
-              </div>
-            )}
+              )}
+
+              {selectedBooking.status === 'CONFIRMED' && (
+                <button
+                  onClick={() => { handleUpdateStatus(selectedBooking.id, 'COMPLETED'); setSelectedBooking(null); }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #4f46e5, #818cf8)', border: 'none', color: '#fff', padding: '9px 18px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                >
+                  <Check size={14} /> Mark Complete
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
