@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Eye, Check, X, Plus } from 'lucide-react';
+import { Search, Plus, Eye, Check, X, Calendar as CalIcon, MapPin, DollarSign, User, FileText, MoreVertical, Trash2 } from 'lucide-react';
 import api from '../services/api';
 
 const statusConfig: Record<string, { bg: string; color: string }> = {
@@ -29,6 +29,7 @@ export default function Bookings() {
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
   const [showAdd, setShowAdd] = useState(false);
+  const [openActionMenu, setOpenActionMenu] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState('');
@@ -46,12 +47,23 @@ export default function Bookings() {
 
   useEffect(() => { fetchBookings(); }, []);
 
-  const handleUpdateStatus = async (id: string, status: string) => {
+  const handleUpdateStatus = async (id: string, newStatus: string) => {
     try {
-      await api.put(`/bookings/${id}`, { status });
+      await api.put(`/bookings/${id}`, { status: newStatus });
       fetchBookings();
-    } catch (error) {
-      console.error('Failed to update status', error);
+    } catch (err) {
+      console.error('Failed to update status', err);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this booking?')) {
+      try {
+        await api.delete(`/bookings/${id}`);
+        fetchBookings();
+      } catch (err) {
+        console.error('Failed to delete booking', err);
+      }
     }
   };
 
@@ -185,25 +197,32 @@ export default function Bookings() {
                     <td style={{ padding: '14px 16px' }}>
                       <span style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: 600, background: sc.bg, color: sc.color }}>{b.status}</span>
                     </td>
-                    <td style={{ padding: '14px 16px' }}>
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button onClick={() => setSelectedBooking(b)} title="View"
-                          style={{ background: 'rgba(30,41,59,0.8)', border: '1px solid #334155', color: '#94a3b8', borderRadius: '8px', padding: '6px', cursor: 'pointer', display: 'flex' }}>
-                          <Eye size={14} />
-                        </button>
-                        {b.status === 'PENDING' && (
-                          <>
-                            <button onClick={() => handleUpdateStatus(b.id, 'CONFIRMED')} title="Approve"
-                              style={{ background: 'rgba(5,150,105,0.15)', border: '1px solid rgba(5,150,105,0.3)', color: '#10b981', borderRadius: '8px', padding: '6px', cursor: 'pointer', display: 'flex' }}>
-                              <Check size={14} />
+                    <td style={{ padding: '14px 16px', position: 'relative' }}>
+                      <button onClick={() => setOpenActionMenu(openActionMenu === b.id ? null : b.id)}
+                        style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '6px' }}>
+                        <MoreVertical size={16} />
+                      </button>
+                      
+                      {openActionMenu === b.id && (
+                        <>
+                          <div style={{ position: 'fixed', inset: 0, zIndex: 9 }} onClick={() => setOpenActionMenu(null)} />
+                          <div style={{ position: 'absolute', right: '30px', top: '40px', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', padding: '4px', zIndex: 10, width: '140px', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}>
+                            <button onClick={() => { setSelectedBooking(b); setOpenActionMenu(null); }}
+                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#f8fafc', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
+                              <Eye size={14} /> View Details
                             </button>
-                            <button onClick={() => handleUpdateStatus(b.id, 'CANCELLED')} title="Reject"
-                              style={{ background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', color: '#ef4444', borderRadius: '8px', padding: '6px', cursor: 'pointer', display: 'flex' }}>
-                              <X size={14} />
+                            <button onClick={() => { handleUpdateStatus(b.id, b.status === 'CONFIRMED' ? 'PENDING' : 'CONFIRMED'); setOpenActionMenu(null); }}
+                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#f8fafc', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
+                              <Check size={14} /> Toggle Status
                             </button>
-                          </>
-                        )}
-                      </div>
+                            <div style={{ height: '1px', background: '#334155', margin: '4px 0' }} />
+                            <button onClick={() => { handleDelete(b.id); setOpenActionMenu(null); }}
+                              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px', background: 'transparent', border: 'none', color: '#ef4444', fontSize: '13px', cursor: 'pointer', textAlign: 'left', borderRadius: '4px' }}>
+                              <Trash2 size={14} /> Delete
+                            </button>
+                          </div>
+                        </>
+                      )}
                     </td>
                   </tr>
                 );
@@ -254,7 +273,7 @@ export default function Bookings() {
             <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
                 <label style={labelStyle}>Client Name *</label>
-                <input style={inputStyle} placeholder="e.g. Adewale & Chisom Johnson"
+                <input style={inputStyle} placeholder="e.g. Kwame & Ama Mensah"
                   value={form.client} onChange={e => setForm(f => ({ ...f, client: e.target.value }))} />
               </div>
               <div>
@@ -285,7 +304,7 @@ export default function Bookings() {
               </div>
               <div>
                 <label style={labelStyle}>Venue / Location *</label>
-                <input style={inputStyle} placeholder="e.g. Eko Hotel, Victoria Island, Lagos"
+                <input style={inputStyle} placeholder="e.g. Kempinski Hotel, Accra"
                   value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
               </div>
               <div>

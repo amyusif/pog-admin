@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Clock, MapPin, Users, Plus, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Clock, MapPin, Users, Plus, ChevronLeft, ChevronRight, X, Trash2 } from 'lucide-react';
 import api from '../services/api';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -86,7 +86,7 @@ export default function Events() {
     e.preventDefault();
     setFormError('');
     if (!form.title || !form.date || !form.time || !form.venue || !form.type) {
-      setFormError('Please fill in all required fields.');
+      setFormError('Please fill all required fields.');
       return;
     }
     setSubmitting(true);
@@ -96,9 +96,21 @@ export default function Events() {
       setForm(emptyForm);
       fetchEvents();
     } catch (err: any) {
-      setFormError(err?.response?.data?.error || 'Failed to create event.');
+      setFormError(err?.response?.data?.error || 'Failed to add event.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this event?')) {
+      try {
+        await api.delete(`/events/${id}`);
+        setSelectedEvent(null);
+        fetchEvents();
+      } catch (err) {
+        console.error('Failed to delete event', err);
+      }
     }
   };
 
@@ -231,7 +243,7 @@ export default function Events() {
             <form onSubmit={handleAddSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
                 <label style={labelStyle}>Event Title *</label>
-                <input style={inputStyle} placeholder="e.g. Johnson Wedding Reception"
+                <input style={inputStyle} placeholder="e.g. Mensah Wedding Reception"
                   value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} />
               </div>
 
@@ -266,7 +278,7 @@ export default function Events() {
 
               <div>
                 <label style={labelStyle}>Venue *</label>
-                <input style={inputStyle} placeholder="e.g. Eko Hotel, Victoria Island, Lagos"
+                <input style={inputStyle} placeholder="e.g. Kempinski Hotel, Accra"
                   value={form.venue} onChange={e => setForm(f => ({ ...f, venue: e.target.value }))} />
               </div>
 
@@ -303,7 +315,10 @@ export default function Events() {
             onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
               <span style={{ background: `${selectedEvent.color}20`, color: selectedEvent.color, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px' }}>{selectedEvent.type}</span>
-              <button onClick={() => setSelectedEvent(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={18} /></button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => handleDelete(selectedEvent.id)} title="Delete Event" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                <button onClick={() => setSelectedEvent(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={18} /></button>
+              </div>
             </div>
             <h2 style={{ margin: '0 0 20px', fontSize: '18px', fontWeight: 700, color: '#f8fafc' }}>{selectedEvent.title}</h2>
             {[

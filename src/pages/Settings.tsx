@@ -78,13 +78,13 @@ export default function Settings() {
               <InputField label="Website" defaultValue="https://powerofgrace.ng" />
               <InputField label="Instagram" defaultValue="@powerofgrace_ng" />
             </div>
-            <InputField label="Business Address" defaultValue="14 Allen Avenue, Ikeja, Lagos, Nigeria" />
+            <InputField label="Business Address" defaultValue="14 Oxford Street, Osu, Accra, Ghana" />
             <div>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '8px' }}>
                 About / Bio
               </label>
               <textarea
-                defaultValue="Power of Grace Events and Trading Limited is Nigeria's premier live band and event production company, delivering world-class musical experiences for corporate events, weddings, private parties, and festivals."
+                defaultValue="Power of Grace Events and Trading Limited is Ghana's premier live band and event production company, delivering world-class musical experiences for corporate events, weddings, private parties, and festivals."
                 style={{
                   width: '100%', background: '#020617', border: '1px solid #1e293b', borderRadius: '10px',
                   color: '#f8fafc', padding: '10px 14px', fontSize: '14px', outline: 'none',
@@ -153,7 +153,7 @@ export default function Settings() {
                   <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '12px', fontWeight: 700 }}>P</div>
                   <div>
                     <p style={{ margin: 0, fontSize: '14px', color: '#f8fafc', fontWeight: 600 }}>Paystack</p>
-                    <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Nigerian payment gateway</p>
+                    <p style={{ margin: 0, fontSize: '12px', color: '#64748b' }}>Ghanaian payment gateway</p>
                   </div>
                 </div>
                 <span style={{ background: 'rgba(5,150,105,0.15)', color: '#10b981', fontSize: '11px', fontWeight: 600, padding: '3px 10px', borderRadius: '20px' }}>
@@ -163,10 +163,10 @@ export default function Settings() {
               <InputField label="Public Key" defaultValue="pk_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-              <InputField label="Bank Name" defaultValue="First Bank of Nigeria" />
-              <InputField label="Account Number" defaultValue="0123456789" />
-              <InputField label="Account Name" defaultValue="Power of Grace Events Ltd" />
-              <InputField label="Default Currency" defaultValue="NGN (₦)" />
+              <InputField label="Bank Name" defaultValue="GCB Bank" />
+              <InputField label="Account Number" defaultValue="0012345678" />
+              <InputField label="Account Name" defaultValue="Power of Grace Ltd" />
+              <InputField label="Default Currency" defaultValue="GHS (GH₵)" />
             </div>
           </div>
         );

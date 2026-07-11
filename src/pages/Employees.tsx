@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Phone, Mail, Star, X, CheckCircle, XCircle } from 'lucide-react';
+import { Search, Plus, Phone, Mail, Star, X, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import api from '../services/api';
 
 const departmentColors: Record<string, string> = {
@@ -88,6 +88,18 @@ export default function Employees() {
       setFormError(err?.response?.data?.error || 'Failed to add team member.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Are you sure you want to delete this team member?')) {
+      try {
+        await api.delete(`/employees/${id}`);
+        setSelectedEmp(null);
+        fetchEmployees();
+      } catch (err) {
+        console.error('Failed to delete employee', err);
+      }
     }
   };
 
@@ -200,7 +212,7 @@ export default function Employees() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Full Name *</label>
-                  <input style={inputStyle} placeholder="e.g. Adaeze Okonkwo"
+                  <input style={inputStyle} placeholder="e.g. Akua Mensah"
                     value={form.name} onChange={e => handleNameChange(e.target.value)} />
                 </div>
                 <div>
@@ -220,14 +232,14 @@ export default function Employees() {
 
               <div>
                 <label style={labelStyle}>Email Address *</label>
-                <input style={inputStyle} type="email" placeholder="e.g. adaeze@pog.ng"
+                <input style={inputStyle} type="email" placeholder="e.g. akua@pog.com.gh"
                   value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Phone Number</label>
-                  <input style={inputStyle} placeholder="+234 8XX XXX XXXX"
+                  <input style={inputStyle} placeholder="+233 2XX XXX XXXX"
                     value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
                 </div>
                 <div>
@@ -293,7 +305,10 @@ export default function Employees() {
                   </span>
                 </div>
               </div>
-              <button onClick={() => setSelectedEmp(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={20} /></button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => handleDelete(selectedEmp.id)} title="Delete Member" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
+                <button onClick={() => setSelectedEmp(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={20} /></button>
+              </div>
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

@@ -61,4 +61,16 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// DELETE booking
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    await prisma.booking.delete({ where: { id } });
+    res.json({ message: 'Booking deleted successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to delete booking' });
+  }
+});
+
 export default router;
