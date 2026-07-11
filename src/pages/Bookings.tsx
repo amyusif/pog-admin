@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, Eye, Check, X, Calendar as CalIcon, MapPin, DollarSign, User, FileText, MoreVertical, Trash2 } from 'lucide-react';
+import { Search, Plus, Eye, Check, X, Calendar as CalIcon, MapPin, DollarSign, User, FileText, MoreVertical, Trash2, Phone, Mail } from 'lucide-react';
 import api from '../services/api';
 
 const statusConfig: Record<string, { bg: string; color: string }> = {
@@ -20,7 +20,10 @@ const labelStyle: React.CSSProperties = {
   color: '#94a3b8', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.06em',
 };
 
-const emptyForm = { client: '', event: '', date: '', location: '', budget: '', assignedTo: '' };
+const emptyForm = {
+  client: '', event: '', date: '', location: '', budget: '',
+  phone: '', email: '', status: 'PENDING', assignedTo: ''
+};
 
 export default function Bookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -71,7 +74,7 @@ export default function Bookings() {
     e.preventDefault();
     setFormError('');
     if (!form.client || !form.event || !form.date || !form.location || !form.budget) {
-      setFormError('Please fill in all required fields.');
+      setFormError('Please fill all required fields.');
       return;
     }
     setSubmitting(true);
@@ -188,7 +191,12 @@ export default function Bookings() {
                   >
                     <td style={{ padding: '14px 16px' }}>
                       <p style={{ margin: 0, fontSize: '13px', color: '#f8fafc', fontWeight: 500 }}>{b.client}</p>
-                      <p style={{ margin: 0, fontSize: '11px', color: '#64748b' }}>Assigned: {b.assignedTo || '—'}</p>
+                      {(b.phone || b.email) && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '4px' }}>
+                          {b.phone && <p style={{ margin: 0, fontSize: '11px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}><Phone size={10} /> {b.phone}</p>}
+                          {b.email && <p style={{ margin: 0, fontSize: '11px', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}><Mail size={10} /> {b.email}</p>}
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '14px 16px', fontSize: '13px', color: '#cbd5e1' }}>{b.event}</td>
                     <td style={{ padding: '14px 16px', fontSize: '13px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{new Date(b.date).toLocaleDateString()}</td>
@@ -276,6 +284,19 @@ export default function Bookings() {
                 <input style={inputStyle} placeholder="e.g. Kwame & Ama Mensah"
                   value={form.client} onChange={e => setForm(f => ({ ...f, client: e.target.value }))} />
               </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Phone Number</label>
+                  <input style={inputStyle} type="tel" placeholder="e.g. +233 24 123 4567"
+                    value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} />
+                </div>
+                <div>
+                  <label style={labelStyle}>Email Address</label>
+                  <input style={inputStyle} type="email" placeholder="e.g. kwame@example.com"
+                    value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                </div>
+              </div>
               <div>
                 <label style={labelStyle}>Event Type *</label>
                 <select style={inputStyle} value={form.event} onChange={e => setForm(f => ({ ...f, event: e.target.value }))}>
@@ -349,9 +370,12 @@ export default function Bookings() {
             {[
               ['Client', selectedBooking.client],
               ['Event Type', selectedBooking.event],
-              ['Date', new Date(selectedBooking.date).toLocaleDateString('en-NG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
+              ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })],
               ['Location', selectedBooking.location],
               ['Package / Services', selectedBooking.budget],
+              ['Phone Number', selectedBooking.phone || 'Not provided'],
+              ['Email Address', selectedBooking.email || 'Not provided'],
+              ['Status', selectedBooking.status],
               ['Assigned To', selectedBooking.assignedTo || 'Unassigned'],
             ].map(([label, value]) => (
               <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '12px 0', borderBottom: '1px solid #1e293b' }}>

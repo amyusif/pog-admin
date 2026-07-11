@@ -43,6 +43,8 @@ model Booking {
   date      DateTime
   location  String
   budget    String
+  phone     String?
+  email     String?
   status    BookingStatus @default(PENDING)
   assignedTo String?
   createdAt DateTime @default(now())
