@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Clock, MapPin, Users, Plus, ChevronLeft, ChevronRight, X, Trash2 } from 'lucide-react';
 import api from '../services/api';
+import { EventsLoader } from '../components/PageLoader';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -114,7 +115,7 @@ export default function Events() {
     }
   };
 
-  if (loading) return <div style={{ color: '#fff', padding: '40px' }}>Loading events...</div>;
+  if (loading) return <EventsLoader />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

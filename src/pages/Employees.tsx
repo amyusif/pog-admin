@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, Phone, Mail, Star, X, CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import api from '../services/api';
+import { EmployeesLoader } from '../components/PageLoader';
 
 const departmentColors: Record<string, string> = {
   'Rhythm Section': '#7f1d1d',
@@ -103,7 +104,7 @@ export default function Employees() {
     }
   };
 
-  if (loading) return <div style={{ color: '#f8fafc', padding: '40px' }}>Loading employees...</div>;
+  if (loading) return <EmployeesLoader />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>

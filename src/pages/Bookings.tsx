@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Plus, X, Trash2, Phone, Mail, Check } from 'lucide-react';
 import api from '../services/api';
+import { BookingsLoader } from '../components/PageLoader';
 
 const statusConfig: Record<string, { bg: string; color: string }> = {
   CONFIRMED: { bg: 'rgba(5,150,105,0.15)',  color: '#10b981' },
@@ -107,7 +108,7 @@ export default function Bookings() {
   const totalPages = Math.ceil(filtered.length / itemsPerPage);
   const paginatedBookings = filtered.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
-  if (loading) return <div style={{ color: '#f8fafc', padding: '40px' }}>Loading bookings...</div>;
+  if (loading) return <BookingsLoader />;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
