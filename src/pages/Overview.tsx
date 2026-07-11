@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { DollarSign, Users, CalendarCheck, TrendingUp, ArrowUpRight, ArrowDownRight, Clock } from 'lucide-react';
+import { DollarSign, Users, CalendarCheck, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart, Pie, Cell, Legend,
+  PieChart, Pie, Cell,
 } from 'recharts';
 import api from '../services/api';
 
@@ -13,12 +13,7 @@ const eventTypeData = [
   { name: 'Festival', value: 12, color: '#059669' },
 ];
 
-const statusColors: Record<string, string> = {
-  PENDING: '#d97706',
-  CONFIRMED: '#059669',
-  CANCELLED: '#ef4444',
-  COMPLETED: '#1d4ed8'
-};
+
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   if (active && payload && payload.length) {

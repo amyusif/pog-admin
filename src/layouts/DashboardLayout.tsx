@@ -147,14 +147,13 @@ export default function DashboardLayout() {
               padding: '10px 12px',
               borderRadius: '10px',
               textDecoration: 'none',
-              color: '#94a3b8',
+              color: location.pathname === '/settings' ? '#f59e0b' : '#94a3b8',
               marginBottom: '2px',
               transition: 'all 0.15s',
               background: location.pathname === '/settings'
                 ? 'linear-gradient(135deg, rgba(127,29,29,0.4), rgba(217,119,6,0.2))'
                 : 'transparent',
               border: location.pathname === '/settings' ? '1px solid rgba(217,119,6,0.3)' : '1px solid transparent',
-              color: location.pathname === '/settings' ? '#f59e0b' : '#94a3b8',
             } as React.CSSProperties}
           >
             <Settings size={18} />
