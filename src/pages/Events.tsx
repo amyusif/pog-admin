@@ -310,28 +310,48 @@ export default function Events() {
 
       {/* ── Event Detail Modal ── */}
       {selectedEvent && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(4px)' }}
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(6px)' }}
           onClick={() => setSelectedEvent(null)}>
-          <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '20px', padding: '32px', width: '440px', maxWidth: '90vw', borderTop: `4px solid ${selectedEvent.color}` }}
+          <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '20px', width: '480px', maxWidth: '92vw', overflow: 'hidden', boxShadow: '0 24px 60px rgba(0,0,0,0.6)' }}
             onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <span style={{ background: `${selectedEvent.color}20`, color: selectedEvent.color, fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px' }}>{selectedEvent.type}</span>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => handleDelete(selectedEvent.id)} title="Delete Event" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={18} /></button>
-                <button onClick={() => setSelectedEvent(null)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={18} /></button>
+            
+            {/* Modal header */}
+            <div style={{ padding: '20px 24px 16px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#0a0f1a' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <h2 style={{ margin: 0, fontSize: '16px', fontWeight: 700, color: '#f8fafc' }}>Event Details</h2>
+                <span style={{ fontSize: '11px', fontWeight: 700, padding: '3px 10px', borderRadius: '20px', background: `${selectedEvent.color}20`, color: selectedEvent.color }}>
+                  {selectedEvent.type}
+                </span>
               </div>
+              <button onClick={() => setSelectedEvent(null)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', lineHeight: 1 }}>
+                <X size={18} />
+              </button>
             </div>
-            <h2 style={{ margin: '0 0 20px', fontSize: '18px', fontWeight: 700, color: '#f8fafc' }}>{selectedEvent.title}</h2>
-            {[
-              ['Date & Time', `${selectedEvent.date} at ${selectedEvent.time}`],
-              ['Venue', selectedEvent.venue],
-              ['Staff Required', `${selectedEvent.staff} members`],
-            ].map(([label, value]) => (
-              <div key={label} style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #1e293b' }}>
-                <span style={{ fontSize: '13px', color: '#94a3b8' }}>{label}</span>
-                <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500 }}>{value}</span>
-              </div>
-            ))}
+
+            {/* Details grid */}
+            <div style={{ padding: '24px' }}>
+              <h3 style={{ margin: '0 0 20px', fontSize: '20px', fontWeight: 700, color: '#f8fafc' }}>{selectedEvent.title}</h3>
+              {[
+                ['Date & Time', `${new Date(selectedEvent.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })} at ${selectedEvent.time}`],
+                ['Venue', selectedEvent.venue],
+                ['Staff Required', `${selectedEvent.staff} members`],
+              ].map(([label, value]) => (
+                <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid #1e293b' }}>
+                  <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0, marginRight: '12px' }}>{label}</span>
+                  <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500, textAlign: 'right', wordBreak: 'break-all' }}>{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Action buttons */}
+            <div style={{ padding: '16px 24px 20px', display: 'flex', gap: '10px', justifyContent: 'flex-end', background: '#0a0f1a', borderTop: '1px solid #1e293b' }}>
+              <button
+                onClick={() => { if (confirm('Delete this event?')) { handleDelete(selectedEvent.id); setSelectedEvent(null); } }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '9px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+              >
+                <Trash2 size={14} /> Delete Event
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -24,7 +24,9 @@ router.get('/', async (req, res) => {
 // POST new booking
 router.post('/', async (req, res) => {
   try {
-    const { client, event, date, location, budget, bookingType, phone, email, assignedTo } = req.body;
+    const { client, event, date, location, budget, bookingType, phone, email, assignedTo, time } = req.body;
+    
+    // Create the booking
     const newBooking = await prisma.booking.create({
       data: {
         client,
@@ -38,6 +40,20 @@ router.post('/', async (req, res) => {
         assignedTo
       }
     });
+
+    // Also automatically create an event on the calendar
+    await prisma.event.create({
+      data: {
+        title: `${client} (${bookingType || 'Booking'})`,
+        date: new Date(date),
+        time: time || 'TBD',
+        venue: location,
+        type: event,
+        staff: 0,
+        color: '#f59e0b' // Pending/Booking color (amber)
+      }
+    });
+
     res.status(201).json(newBooking);
   } catch (error) {
     console.error(error);
