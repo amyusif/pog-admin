@@ -1,4 +1,4 @@
-import React from 'react';
+// PageLoader — skeleton loaders for each major page
 
 /* ── Shimmer keyframe injected once ── */
 const style = document.createElement('style');
@@ -102,7 +102,7 @@ export function EventsLoader() {
             <Sk w={40} h={36} />
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', marginBottom: '8px' }}>
-            {['S','M','T','W','T','F','S'].map((d, i) => (
+            {['S','M','T','W','T','F','S'].map((_d, i) => (
               <div key={i} style={{ textAlign: 'center', padding: '8px 0' }}>
                 <Sk w={20} h={12} />
               </div>
