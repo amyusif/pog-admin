@@ -43,6 +43,7 @@ model Booking {
   date      DateTime
   location  String
   budget    String
+  bookingType String?
   phone     String?
   email     String?
   status    BookingStatus @default(PENDING)

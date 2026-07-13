@@ -23,7 +23,7 @@ const labelStyle: React.CSSProperties = {
 
 const emptyForm = {
   client: '', event: '', date: '', location: '', budget: '',
-  phone: '', email: '', status: 'PENDING', assignedTo: ''
+  bookingType: '', phone: '', email: '', status: 'PENDING', assignedTo: ''
 };
 
 export default function Bookings() {
@@ -74,7 +74,7 @@ export default function Bookings() {
   const handleAddSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError('');
-    if (!form.client || !form.event || !form.date || !form.location || !form.budget) {
+    if (!form.client || !form.bookingType || !form.event || !form.date || !form.location || !form.budget) {
       setFormError('Please fill all required fields.');
       return;
     }
@@ -177,7 +177,7 @@ export default function Bookings() {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
               <tr style={{ borderBottom: '1px solid #1e293b' }}>
-                {['Client', 'Event', 'Date', 'Location', 'Package / Services', 'Status'].map(h => (
+                {['Client', 'Booking / Service', 'Date', 'Location', 'Package / Services', 'Status'].map(h => (
                   <th key={h} style={{ textAlign: 'left', padding: '14px 16px', fontSize: '11px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.08em', background: '#0a0f1a' }}>{h}</th>
                 ))}
               </tr>
@@ -205,7 +205,10 @@ export default function Bookings() {
                         </div>
                       )}
                     </td>
-                    <td style={{ padding: '14px 16px', fontSize: '13px', color: '#cbd5e1' }}>{b.event}</td>
+                    <td style={{ padding: '14px 16px' }}>
+                      <span style={{ display: 'block', fontSize: '13px', color: '#f8fafc', fontWeight: 500, marginBottom: '2px' }}>{b.bookingType || '—'}</span>
+                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>{b.event}</span>
+                    </td>
                     <td style={{ padding: '14px 16px', fontSize: '13px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{new Date(b.date).toLocaleDateString()}</td>
                     <td style={{ padding: '14px 16px', fontSize: '12px', color: '#94a3b8', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.location}</td>
                     <td style={{ padding: '14px 16px', fontSize: '13px', color: '#d97706', fontWeight: 600, maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={b.budget}>{b.budget}</td>
@@ -277,14 +280,24 @@ export default function Bookings() {
                     value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
                 </div>
               </div>
-              <div>
-                <label style={labelStyle}>Event Type *</label>
-                <select style={inputStyle} value={form.event} onChange={e => setForm(f => ({ ...f, event: e.target.value }))}>
-                  <option value="">Select event type...</option>
-                  {['Wedding', 'Corporate Event', 'Private Party', 'Concert/Festival', 'Birthday', 'Other'].map(t => (
-                    <option key={t} value={t}>{t}</option>
-                  ))}
-                </select>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
+                  <label style={labelStyle}>Booking Type *</label>
+                  <select style={inputStyle} value={form.bookingType} onChange={e => setForm(f => ({ ...f, bookingType: e.target.value }))}>
+                    <option value="">Select type...</option>
+                    <option value="Live Band">Live Band</option>
+                    <option value="LED Screens">LED Screens</option>
+                  </select>
+                </div>
+                <div>
+                  <label style={labelStyle}>Service (Event) *</label>
+                  <select style={inputStyle} value={form.event} onChange={e => setForm(f => ({ ...f, event: e.target.value }))}>
+                    <option value="">Select service...</option>
+                    {['Wedding', 'Corporate Event', 'Private Party', 'Concert/Festival', 'Birthday', 'Other'].map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
@@ -360,7 +373,8 @@ export default function Bookings() {
             <div style={{ padding: '16px 24px' }}>
               {[
                 ['Client', selectedBooking.client],
-                ['Event Type', selectedBooking.event],
+                ['Booking Type', selectedBooking.bookingType || '—'],
+                ['Service', selectedBooking.event],
                 ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })],
                 ['Location', selectedBooking.location],
                 ['Package / Services', selectedBooking.budget],
