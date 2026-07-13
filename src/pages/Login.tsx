@@ -166,10 +166,6 @@ export default function Login() {
               ) : 'Sign In'}
             </button>
           </form>
-
-          <p className="mt-6 text-center text-xs text-slate-600">
-            Demo: admin@powerofgrace.com / admin123
-          </p>
         </div>
       </div>
     </div>
