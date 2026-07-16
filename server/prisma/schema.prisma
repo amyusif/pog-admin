@@ -37,19 +37,21 @@ enum Role {
 }
 
 model Booking {
-  id        String   @id @default(uuid())
-  client    String
-  event     String
-  date      DateTime
-  location  String
-  budget    String
+  id          String        @id @default(uuid())
+  client      String
+  event       String
+  date        DateTime
+  location    String
+  budget      String
   bookingType String?
-  phone     String?
-  email     String?
-  status    BookingStatus @default(PENDING)
-  assignedTo String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  subType     String?
+  customSpec  String?
+  phone       String?
+  email       String?
+  status      BookingStatus @default(PENDING)
+  assignedTo  String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 }
 
 enum BookingStatus {

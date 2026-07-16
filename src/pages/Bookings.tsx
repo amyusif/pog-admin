@@ -23,7 +23,7 @@ const labelStyle: React.CSSProperties = {
 
 const emptyForm = {
   client: '', event: '', date: '', location: '', budget: '',
-  bookingType: '', phone: '', email: '', status: 'PENDING', assignedTo: ''
+  bookingType: '', subType: '', phone: '', email: '', status: 'PENDING', assignedTo: ''
 };
 
 export default function Bookings() {
@@ -207,7 +207,7 @@ export default function Bookings() {
                     </td>
                     <td style={{ padding: '14px 16px' }}>
                       <span style={{ display: 'block', fontSize: '13px', color: '#f8fafc', fontWeight: 500, marginBottom: '2px' }}>{b.bookingType || '—'}</span>
-                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>{b.event}</span>
+                      <span style={{ fontSize: '11px', color: '#94a3b8' }}>{b.subType || b.event}</span>
                     </td>
                     <td style={{ padding: '14px 16px', fontSize: '13px', color: '#cbd5e1', whiteSpace: 'nowrap' }}>{new Date(b.date).toLocaleDateString()}</td>
                     <td style={{ padding: '14px 16px', fontSize: '12px', color: '#94a3b8', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.location}</td>
@@ -283,12 +283,22 @@ export default function Bookings() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Booking Type *</label>
-                  <select style={inputStyle} value={form.bookingType} onChange={e => setForm(f => ({ ...f, bookingType: e.target.value }))}>
+                  <select style={inputStyle} value={form.bookingType} onChange={e => setForm(f => ({ ...f, bookingType: e.target.value, subType: '' }))}>
                     <option value="">Select type...</option>
                     <option value="Live Band">Live Band</option>
                     <option value="LED Screens">LED Screens</option>
                   </select>
                 </div>
+                <div>
+                  <label style={labelStyle}>Sub-type (if Live Band)</label>
+                  <select style={inputStyle} value={form.subType} onChange={e => setForm(f => ({ ...f, subType: e.target.value }))} disabled={form.bookingType !== 'Live Band'}>
+                    <option value="">—</option>
+                    <option value="Live Event">Live Event</option>
+                    <option value="Musical Instrument Rentals">Musical Instrument Rentals</option>
+                  </select>
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Service (Event) *</label>
                   <select style={inputStyle} value={form.event} onChange={e => setForm(f => ({ ...f, event: e.target.value }))}>
@@ -298,13 +308,13 @@ export default function Bookings() {
                     ))}
                   </select>
                 </div>
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Event Date *</label>
                   <input style={inputStyle} type="date"
                     value={form.date} onChange={e => setForm(f => ({ ...f, date: e.target.value }))} />
                 </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div>
                   <label style={labelStyle}>Package / Services *</label>
                   <select style={inputStyle} value={form.budget} onChange={e => setForm(f => ({ ...f, budget: e.target.value }))}>
@@ -315,11 +325,11 @@ export default function Bookings() {
                     <option value="Custom Setup">Custom Setup</option>
                   </select>
                 </div>
-              </div>
-              <div>
-                <label style={labelStyle}>Venue / Location *</label>
-                <input style={inputStyle} placeholder="e.g. Kempinski Hotel, Accra"
-                  value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
+                <div>
+                  <label style={labelStyle}>Venue / Location *</label>
+                  <input style={inputStyle} placeholder="e.g. Kempinski Hotel, Accra"
+                    value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
+                </div>
               </div>
               <div>
                 <label style={labelStyle}>Assigned To</label>
@@ -374,7 +384,7 @@ export default function Bookings() {
               {[
                 ['Client', selectedBooking.client],
                 ['Booking Type', selectedBooking.bookingType || '—'],
-                ['Service', selectedBooking.event],
+                ['Sub-type / Service', selectedBooking.subType ? `${selectedBooking.subType} · ${selectedBooking.event}` : selectedBooking.event],
                 ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })],
                 ['Location', selectedBooking.location],
                 ['Package / Services', selectedBooking.budget],
