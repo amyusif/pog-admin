@@ -22,7 +22,7 @@ const labelStyle: React.CSSProperties = {
 };
 
 const emptyForm = {
-  client: '', event: '', date: '', location: '', budget: '',
+  client: '', event: '', date: '', location: '', budget: '', clientBudget: '',
   bookingType: '', subType: '', phone: '', email: '', status: 'PENDING', assignedTo: ''
 };
 
@@ -326,6 +326,13 @@ export default function Bookings() {
                   </select>
                 </div>
                 <div>
+                  <label style={labelStyle}>Client Budget (GH₵)</label>
+                  <input style={inputStyle} type="number" placeholder="e.g. 5000"
+                    value={form.clientBudget} onChange={e => setForm(f => ({ ...f, clientBudget: e.target.value }))} />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                <div>
                   <label style={labelStyle}>Venue / Location *</label>
                   <input style={inputStyle} placeholder="e.g. Kempinski Hotel, Accra"
                     value={form.location} onChange={e => setForm(f => ({ ...f, location: e.target.value }))} />
@@ -388,6 +395,7 @@ export default function Bookings() {
                 ['Event Date', new Date(selectedBooking.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })],
                 ['Location', selectedBooking.location],
                 ['Package / Services', selectedBooking.budget],
+                ['Client Budget', selectedBooking.clientBudget ? `GH₵${selectedBooking.clientBudget}` : '—'],
                 ['Phone', selectedBooking.phone || '—'],
                 ['Email', selectedBooking.email || '—'],
                 ['Assigned To', selectedBooking.assignedTo || 'Unassigned'],

@@ -43,6 +43,7 @@ model Booking {
   date        DateTime
   location    String
   budget      String
+  clientBudget String?
   bookingType String?
   subType     String?
   customSpec  String?
