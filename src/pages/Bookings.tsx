@@ -303,7 +303,7 @@ export default function Bookings() {
                   <label style={labelStyle}>Service (Event) *</label>
                   <select style={inputStyle} value={form.event} onChange={e => setForm(f => ({ ...f, event: e.target.value }))}>
                     <option value="">Select service...</option>
-                    {['Wedding', 'Corporate Event', 'Private Party', 'Concert/Festival', 'Birthday', 'Other'].map(t => (
+                    {['Wedding', 'Corporate Event', 'Private Party', 'Concert/Festival', 'Birthday', 'Gospel Rock Show', 'SRC Programs', 'Other'].map(t => (
                       <option key={t} value={t}>{t}</option>
                     ))}
                   </select>
