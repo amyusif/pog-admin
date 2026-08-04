@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { sendClientBookingConfirmation, sendAdminBookingNotification } from '../utils/email';
 
 const router = Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -57,6 +58,12 @@ router.post('/', async (req, res) => {
       }
     });
 
+    // Send email notifications asynchronously
+    if (email) {
+      sendClientBookingConfirmation(email, client).catch(console.error);
+    }
+    sendAdminBookingNotification(newBooking).catch(console.error);
+
     res.status(201).json(newBooking);
   } catch (error) {
     console.error(error);
@@ -68,12 +75,13 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, assignedTo } = req.body;
+    const { status, assignedTo, quotedPrice } = req.body;
     const updatedBooking = await prisma.booking.update({
       where: { id },
       data: {
         ...(status && { status }),
-        ...(assignedTo !== undefined && { assignedTo })
+        ...(assignedTo !== undefined && { assignedTo }),
+        ...(quotedPrice !== undefined && { quotedPrice })
       }
     });
     res.json(updatedBooking);

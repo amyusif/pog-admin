@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, X, Trash2, Phone, Mail, Check } from 'lucide-react';
+import { Search, Plus, X, Trash2, Phone, Mail, Check, MessageCircle } from 'lucide-react';
 import api from '../services/api';
 import { BookingsLoader } from '../components/PageLoader';
 
@@ -32,6 +32,8 @@ export default function Bookings() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('All');
   const [selectedBooking, setSelectedBooking] = useState<any | null>(null);
+  const [quotedPriceInput, setQuotedPriceInput] = useState('');
+  const [isEditingPrice, setIsEditingPrice] = useState(false);
   const [showAdd, setShowAdd] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -51,9 +53,9 @@ export default function Bookings() {
 
   useEffect(() => { fetchBookings(); }, []);
 
-  const handleUpdateStatus = async (id: string, newStatus: string) => {
+  const handleUpdateStatus = async (id: string, newStatus: string, extraData: any = {}) => {
     try {
-      await api.put(`/bookings/${id}`, { status: newStatus });
+      await api.put(`/bookings/${id}`, { status: newStatus, ...extraData });
       fetchBookings();
     } catch (err) {
       console.error('Failed to update status', err);
@@ -187,7 +189,11 @@ export default function Bookings() {
                 const sc = statusConfig[b.status] || { bg: '#1e293b', color: '#94a3b8' };
                 return (
                   <tr key={b.id}
-                    onClick={() => setSelectedBooking(b)}
+                    onClick={() => {
+                      setSelectedBooking(b);
+                      setQuotedPriceInput(b.quotedPrice || '');
+                      setIsEditingPrice(b.status === 'PENDING');
+                    }}
                     style={{
                       borderBottom: i < paginatedBookings.length - 1 ? '1px solid #1e293b' : 'none',
                       transition: 'background 0.1s',
@@ -396,13 +402,53 @@ export default function Bookings() {
                 ['Location', selectedBooking.location],
                 ['Package / Services', selectedBooking.budget],
                 ['Client Budget', selectedBooking.clientBudget ? `GH₵${selectedBooking.clientBudget}` : '—'],
+                ['Quoted Price', 'CUSTOM_RENDER'],
                 ['Phone', selectedBooking.phone || '—'],
                 ['Email', selectedBooking.email || '—'],
                 ['Assigned To', selectedBooking.assignedTo || 'Unassigned'],
               ].map(([label, value]) => (
                 <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '9px 0', borderBottom: '1px solid #1e293b' }}>
                   <span style={{ fontSize: '12px', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0, marginRight: '12px' }}>{label}</span>
-                  <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500, textAlign: 'right', wordBreak: 'break-all' }}>{value}</span>
+                  {value === 'CUSTOM_RENDER' ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      {isEditingPrice ? (
+                        <>
+                          <input 
+                            type="number" 
+                            placeholder="e.g. 5000" 
+                            value={quotedPriceInput} 
+                            onChange={e => setQuotedPriceInput(e.target.value)} 
+                            style={{ background: '#1e293b', border: '1px solid #334155', color: '#f8fafc', padding: '4px 8px', borderRadius: '4px', fontSize: '13px', width: '100px', outline: 'none' }} 
+                          />
+                          {selectedBooking.status !== 'PENDING' && (
+                            <button 
+                              onClick={async () => {
+                                await api.put(`/bookings/${selectedBooking.id}`, { quotedPrice: quotedPriceInput });
+                                fetchBookings();
+                                setIsEditingPrice(false);
+                                setSelectedBooking({...selectedBooking, quotedPrice: quotedPriceInput});
+                              }}
+                              style={{ background: 'transparent', border: '1px solid #10b981', color: '#10b981', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer', fontWeight: 600 }}
+                            >
+                              Save
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500 }}>{quotedPriceInput ? `GH₵${quotedPriceInput}` : '—'}</span>
+                          <button 
+                            onClick={() => setIsEditingPrice(true)}
+                            style={{ background: 'transparent', border: '1px solid #334155', color: '#94a3b8', padding: '2px 6px', borderRadius: '4px', fontSize: '11px', cursor: 'pointer' }}
+                          >
+                            Edit
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ) : (
+                    <span style={{ fontSize: '13px', color: '#f8fafc', fontWeight: 500, textAlign: 'right', wordBreak: 'break-all' }}>{value}</span>
+                  )}
                 </div>
               ))}
             </div>
@@ -411,7 +457,7 @@ export default function Bookings() {
             <div style={{ padding: '16px 24px 20px', display: 'flex', gap: '10px', justifyContent: 'flex-end', background: '#0a0f1a', borderTop: '1px solid #1e293b' }}>
               <button
                 onClick={() => { if (confirm('Delete this booking?')) { handleDelete(selectedBooking.id); setSelectedBooking(null); } }}
-                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '9px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '9px 16px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', marginRight: 'auto' }}
               >
                 <Trash2 size={14} /> Delete
               </button>
@@ -427,7 +473,14 @@ export default function Bookings() {
 
               {(selectedBooking.status === 'PENDING' || selectedBooking.status === 'CANCELLED') && (
                 <button
-                  onClick={() => { handleUpdateStatus(selectedBooking.id, 'CONFIRMED'); setSelectedBooking(null); }}
+                  onClick={() => { 
+                    handleUpdateStatus(selectedBooking.id, 'CONFIRMED', { quotedPrice: quotedPriceInput }); 
+                    if (selectedBooking.phone) {
+                      const msg = `Hi ${selectedBooking.client}, we have received your booking request for ${selectedBooking.event} on ${new Date(selectedBooking.date).toLocaleDateString()}. The quoted price is GH₵${quotedPriceInput || 'TBD'}. We will get back to you shortly.`;
+                      window.open(`https://wa.me/${selectedBooking.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(msg)}`, '_blank');
+                    }
+                    setSelectedBooking(null); 
+                  }}
                   style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'linear-gradient(135deg, #059669, #10b981)', border: 'none', color: '#fff', padding: '9px 18px', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
                 >
                   <Check size={14} /> Approve
