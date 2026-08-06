@@ -21,12 +21,15 @@ export const sendClientBookingConfirmation = async (email: string, clientName: s
     subject: 'Booking Request Received - POG Events',
     text: `Thank you for your booking request, ${clientName}!\n\nWe have successfully received your event booking request.\nOur team is currently reviewing your details, and we will get back to you within 24 hours to confirm your booking and discuss the next steps.\n\nBest regards,\nPowers of Grace Events & Trading Ltd.`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h2>Thank you for your booking request, ${clientName}!</h2>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; border-radius: 12px; padding: 24px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 24px; padding: 16px; background-color: #09090b; border-radius: 8px;">
+          <img src="https://pogeventsandtradingltd.org/logo.png" alt="POG Events Logo" style="height: 60px; width: auto; object-fit: contain;" />
+        </div>
+        <h2 style="color: #09090b; margin-top: 0;">Thank you for your booking request, ${clientName}!</h2>
         <p>We have successfully received your event booking request.</p>
         <p>Our team is currently reviewing your details, and we will get back to you within 24 hours to confirm your booking and discuss the next steps.</p>
         <br />
-        <p>Best regards,<br /><strong>Powers of Grace Events & Trading Ltd.</strong></p>
+        <p style="margin-bottom: 0;">Best regards,<br /><strong>Powers of Grace Events & Trading Ltd.</strong></p>
       </div>
     `,
   };
@@ -48,16 +51,20 @@ export const sendAdminBookingNotification = async (bookingDetails: any) => {
   const assistantEmail = 'am.yusif530@gmail.com';
   
   const dashboardUrl = 'https://admin.pogeventsandtradingltd.org';
+  const userBudgetFormatted = bookingDetails.clientBudget ? `GH₵${bookingDetails.clientBudget}` : 'N/A';
 
   const mailOptions = {
     from: `"POG EVENTS and TRADING LTD" <${process.env.SMTP_USER}>`,
     to: [adminEmail, assistantEmail].join(','),
     replyTo: bookingDetails.email || process.env.SMTP_USER,
     subject: `New Booking Request: ${bookingDetails.event}`,
-    text: `New Booking Request Received\n\nClient: ${bookingDetails.client}\nEvent: ${bookingDetails.event}\nDate: ${new Date(bookingDetails.date).toLocaleDateString()}\nLocation: ${bookingDetails.location}\nPackage: ${bookingDetails.budget}\nPhone: ${bookingDetails.phone || 'N/A'}\nEmail: ${bookingDetails.email || 'N/A'}\n\nView in Admin Dashboard: ${dashboardUrl}`,
+    text: `New Booking Request Received\n\nClient: ${bookingDetails.client}\nEvent: ${bookingDetails.event}\nDate: ${new Date(bookingDetails.date).toLocaleDateString()}\nLocation: ${bookingDetails.location}\nPackage: ${bookingDetails.budget}\nUser Budget: ${userBudgetFormatted}\nPhone: ${bookingDetails.phone || 'N/A'}\nEmail: ${bookingDetails.email || 'N/A'}\n\nView in Admin Dashboard: ${dashboardUrl}`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-        <h2 style="color: #d97706;">New Booking Request Received</h2>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333; border: 1px solid #eee; border-radius: 12px; padding: 24px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 24px; padding: 16px; background-color: #09090b; border-radius: 8px;">
+          <img src="https://pogeventsandtradingltd.org/logo.png" alt="POG Events Logo" style="height: 60px; width: auto; object-fit: contain;" />
+        </div>
+        <h2 style="color: #d97706; margin-top: 0;">New Booking Request Received</h2>
         <p>A new booking request has been submitted on the website.</p>
         
         <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
@@ -66,6 +73,7 @@ export const sendAdminBookingNotification = async (bookingDetails: any) => {
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Date:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${new Date(bookingDetails.date).toLocaleDateString()}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Location:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingDetails.location}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Package:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingDetails.budget}</td></tr>
+          <tr><td style="padding: 8px; border-bottom: 1px solid #eee; color: #d97706;"><strong>User Target Budget:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee; color: #d97706; font-weight: bold;">${userBudgetFormatted}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Phone:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingDetails.phone || 'N/A'}</td></tr>
           <tr><td style="padding: 8px; border-bottom: 1px solid #eee;"><strong>Email:</strong></td><td style="padding: 8px; border-bottom: 1px solid #eee;">${bookingDetails.email || 'N/A'}</td></tr>
         </table>
