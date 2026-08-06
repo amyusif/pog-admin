@@ -17,7 +17,9 @@ export const sendClientBookingConfirmation = async (email: string, clientName: s
   const mailOptions = {
     from: `"POG EVENTS and TRADING LTD" <${process.env.SMTP_USER}>`,
     to: email,
+    replyTo: process.env.SMTP_USER,
     subject: 'Booking Request Received - POG Events',
+    text: `Thank you for your booking request, ${clientName}!\n\nWe have successfully received your event booking request.\nOur team is currently reviewing your details, and we will get back to you within 24 hours to confirm your booking and discuss the next steps.\n\nBest regards,\nPowers of Grace Events & Trading Ltd.`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
         <h2>Thank you for your booking request, ${clientName}!</h2>
@@ -42,7 +44,7 @@ export const sendAdminBookingNotification = async (bookingDetails: any) => {
     return;
   }
 
-  const adminEmail = 'oseisolomon49@gmail.com';
+  const adminEmail = 'banksymir@gmail.com';
   const assistantEmail = 'am.yusif530@gmail.com';
   
   const dashboardUrl = 'https://admin.pogeventsandtradingltd.org';
@@ -50,7 +52,9 @@ export const sendAdminBookingNotification = async (bookingDetails: any) => {
   const mailOptions = {
     from: `"POG EVENTS and TRADING LTD" <${process.env.SMTP_USER}>`,
     to: [adminEmail, assistantEmail].join(','),
+    replyTo: bookingDetails.email || process.env.SMTP_USER,
     subject: `New Booking Request: ${bookingDetails.event}`,
+    text: `New Booking Request Received\n\nClient: ${bookingDetails.client}\nEvent: ${bookingDetails.event}\nDate: ${new Date(bookingDetails.date).toLocaleDateString()}\nLocation: ${bookingDetails.location}\nPackage: ${bookingDetails.budget}\nPhone: ${bookingDetails.phone || 'N/A'}\nEmail: ${bookingDetails.email || 'N/A'}\n\nView in Admin Dashboard: ${dashboardUrl}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
         <h2 style="color: #d97706;">New Booking Request Received</h2>
