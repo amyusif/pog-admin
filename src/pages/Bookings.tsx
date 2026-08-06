@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Plus, X, Trash2, Phone, Mail, Check, MessageCircle } from 'lucide-react';
+import { Search, Plus, X, Trash2, Phone, Mail, Check } from 'lucide-react';
 import api from '../services/api';
 import { BookingsLoader } from '../components/PageLoader';
 
