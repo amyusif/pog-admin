@@ -47,7 +47,7 @@ export const sendAdminBookingNotification = async (bookingDetails: any) => {
     return;
   }
 
-  const adminEmail = 'banksymir@gmail.com';
+  const adminEmail = 'oseisolomon49@gmail.com';
   const assistantEmail = 'am.yusif530@gmail.com';
   
   const dashboardUrl = 'https://admin.pogeventsandtradingltd.org';

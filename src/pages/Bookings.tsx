@@ -82,7 +82,16 @@ export default function Bookings() {
     }
     setSubmitting(true);
     try {
-      await api.post('/bookings', form);
+      await api.post('/bookings', { ...form, status: 'CONFIRMED' });
+
+      // Automatically open WhatsApp with booking details to the provided contact number
+      if (form.phone) {
+        const cleanPhone = form.phone.replace(/[^0-9]/g, '');
+        const dateFormatted = new Date(form.date).toLocaleDateString('en-GH', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+        const msg = `Hi ${form.client}, your booking for ${form.event} on ${dateFormatted} has been confirmed! Package/Budget: ${form.budget}. We look forward to working with you.`;
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+
       setShowAdd(false);
       setForm(emptyForm);
       fetchBookings();

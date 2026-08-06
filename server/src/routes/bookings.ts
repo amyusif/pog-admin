@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
 // POST new booking
 router.post('/', async (req, res) => {
   try {
-    const { client, event, date, location, budget, clientBudget, bookingType, subType, customSpec, phone, email, assignedTo, time } = req.body;
+    const { client, event, date, location, budget, clientBudget, quotedPrice, bookingType, subType, customSpec, phone, email, assignedTo, time, status } = req.body;
     
     // Create the booking
     const newBooking = await prisma.booking.create({
@@ -36,12 +36,14 @@ router.post('/', async (req, res) => {
         location,
         budget,
         clientBudget,
+        quotedPrice,
         bookingType,
         subType,
         customSpec,
         phone,
         email,
-        assignedTo
+        assignedTo,
+        ...(status && { status })
       }
     });
 
